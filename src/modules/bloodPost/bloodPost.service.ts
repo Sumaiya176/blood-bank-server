@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { User } from "../users/user.model";
 import { TBloodPost } from "./bloodPost.interface";
 import { BloodPost } from "./bloodPost.model";
@@ -38,14 +39,48 @@ const updateBloodPostToDatabase = async (
 
   return result;
 };
+
 const saveDonationHistoryIntoDb = async (
+  id: string,
+  postId: { id: string }
+) => {
+  const findDonationHistory = await User.findById(id);
+  console.log(
+    "findDonationHistory",
+    findDonationHistory?.donationHistory.includes(
+      postId.id as unknown as ObjectId
+    )
+  );
+
+  if (findDonationHistory) {
+    throw new Error("This post is already accepted");
+  }
+  const result = await User.findByIdAndUpdate(
+    id,
+    {
+      $push: { donationHistory: postId.id },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!result) {
+    throw new Error("Failed to add blood donation history");
+  }
+
+  return result;
+};
+
+const saveDonationCancelHistoryIntoDb = async (
   id: string,
   postId: { id: string }
 ) => {
   const result = await User.findByIdAndUpdate(
     id,
     {
-      $push: { donationHistory: postId.id },
+      $push: { cancelHistory: postId.id },
     },
     {
       new: true,
@@ -65,4 +100,5 @@ export default {
   bloodPostSendToDatabase,
   updateBloodPostToDatabase,
   saveDonationHistoryIntoDb,
+  saveDonationCancelHistoryIntoDb,
 };

@@ -9,4 +9,5 @@ export type TUser = {
   lastDonationDate: string;
   donationAvailability: boolean;
   donationHistory: [Types.ObjectId];
+  cancelHistory: [Types.ObjectId];
 };

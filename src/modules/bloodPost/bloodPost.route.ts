@@ -10,5 +10,9 @@ router.patch(
   "/create-donation-history/:id",
   bloodPostControllers.createDonationHistory
 );
+router.patch(
+  "/create-donation-cancel-history/:id",
+  bloodPostControllers.createDonationCancelHistory
+);
 
 export const bloodPostRouter = router;

@@ -38,8 +38,22 @@ const updatePendingStatusToAccepted = async (id: string) => {
   return result;
 };
 
+const updatePendingStatusToRejected = async (id: string) => {
+  const result = await DonorRequest.findByIdAndUpdate(
+    id,
+    { status: "rejected" },
+    { new: true, runValidators: true }
+  );
+
+  if (!result) {
+    throw new Error("Failed to retrieved requests");
+  }
+  return result;
+};
+
 export default {
   donorRequestSendToDatabase,
   getReceivedDonorRequest,
   updatePendingStatusToAccepted,
+  updatePendingStatusToRejected,
 };

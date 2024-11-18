@@ -49,11 +49,31 @@ const createDonationHistory: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   const { postId } = req.body;
   // console.log(id, req.body);
-  const result = await bloodPostService.saveDonationHistoryIntoDb(id, postId);
+  try {
+    const result = await bloodPostService.saveDonationHistoryIntoDb(id, postId);
+
+    sendResponse(res, {
+      success: true,
+      message: "Blood post accepted successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const createDonationCancelHistory: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+  const { postId } = req.body;
+  // console.log(id, req.body);
+  const result = await bloodPostService.saveDonationCancelHistoryIntoDb(
+    id,
+    postId
+  );
 
   sendResponse(res, {
     success: true,
-    message: "Blood event accepted successfully",
+    message: "Blood event rejected successfully",
     data: result,
   });
 };
@@ -63,4 +83,5 @@ export const bloodPostControllers = {
   updateBloodPost,
   getAllBloodPosts,
   createDonationHistory,
+  createDonationCancelHistory,
 };

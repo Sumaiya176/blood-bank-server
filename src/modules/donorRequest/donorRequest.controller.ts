@@ -46,8 +46,27 @@ const updatePendingStatusToAccepted: RequestHandler = async (
   });
 };
 
+const updatePendingStatusToRejected: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { requestId } = req.query;
+  console.log(requestId);
+  const result = await donarRequestService.updatePendingStatusToRejected(
+    requestId as string
+  );
+
+  sendResponse(res, {
+    success: true,
+    message: "Pending status updated successfully",
+    data: result,
+  });
+};
+
 export const donorRequestControllers = {
   createDonorRequest,
   getReceivedDonorRequest,
   updatePendingStatusToAccepted,
+  updatePendingStatusToRejected,
 };
