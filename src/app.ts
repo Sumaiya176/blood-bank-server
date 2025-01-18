@@ -13,11 +13,23 @@ const app: Application = express();
 //   })
 // );
 
+const allowedOrigins = [
+  "http://localhost:3000", // Local development
+  "https://blood-bank-frontend-blue.vercel.app", // Production frontend
+];
+
 app.use(
   cors({
-    origin: "https://blood-bank-frontend-blue.vercel.app",
-    // methods: ["GET", "POST", "PUT", "DELETE"], // Add any methods you need
-    credentials: true, // If you need to include credentials like cookies
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"], // Include the HTTP methods you need
+    credentials: true, // Include cookies or credentials
   })
 );
 
