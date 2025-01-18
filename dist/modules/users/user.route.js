@@ -8,7 +8,7 @@ const express_1 = __importDefault(require("express"));
 const user_controller_1 = __importDefault(require("./user.controller"));
 const auth_1 = __importDefault(require("../../middlewares/auth"));
 const router = express_1.default.Router();
-router.get("/active-users", (0, auth_1.default)(), user_controller_1.default.activeUsers);
+router.get("/active-users", user_controller_1.default.activeUsers);
 router.get("/all-users", user_controller_1.default.allUsers);
 router.get("/users-with-donation-history", user_controller_1.default.usersWithDonationHistory);
 router.get("/single-user/:id", user_controller_1.default.getSingleUser);

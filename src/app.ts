@@ -15,7 +15,7 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://blood-bank-frontend-blue.vercel.app",
     // methods: ["GET", "POST", "PUT", "DELETE"], // Add any methods you need
     credentials: true, // If you need to include credentials like cookies
   })

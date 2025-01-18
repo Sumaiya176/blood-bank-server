@@ -4,7 +4,7 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.get("/active-users", auth(), userController.activeUsers);
+router.get("/active-users", userController.activeUsers);
 router.get("/all-users", userController.allUsers);
 router.get(
   "/users-with-donation-history",
