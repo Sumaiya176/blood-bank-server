@@ -25,7 +25,7 @@ const userSchema = new Schema(
       type: Number,
       required: true,
     },
-    location: {
+    district: {
       type: String,
       required: true,
     },
@@ -37,10 +37,32 @@ const userSchema = new Schema(
       required: true,
       default: true,
     },
+    bloodGroup: {
+      type: String,
+      required: true,
+    },
+    points: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 2,
+    },
     donationHistory: [
       {
         type: Schema.Types.ObjectId,
         ref: "BloodPost",
+      },
+    ],
+    postHistory: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "BloodPost",
+      },
+    ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
   },

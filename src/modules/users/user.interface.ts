@@ -5,9 +5,13 @@ export type TUser = {
   email: string;
   password: string;
   age: number;
-  location: string;
+  district: string;
   lastDonationDate: string;
   donationAvailability: boolean;
+  bloodGroup: string;
+  points: number;
   donationHistory: [Types.ObjectId];
+  postHistory: [Types.ObjectId];
   cancelHistory: [Types.ObjectId];
+  friends: [Types.ObjectId];
 };

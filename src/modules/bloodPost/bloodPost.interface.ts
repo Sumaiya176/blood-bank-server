@@ -2,11 +2,21 @@ import { Types } from "mongoose";
 
 export type TBloodPost = {
   bloodGroup: "A+" | " A-" | "B+" | "B-" | "O+" | "O-" | "AB+" | "AB-";
-  location: string;
+  district: string;
+  address: string;
   time: string;
   contact: string;
   patientName: string;
   note: string;
-  donar: Types.ObjectId;
+  noOfBags: number;
+  accepted: number;
+  status: "pending" | "donated" | "canceled" | "due";
+  donar: [Types.ObjectId];
   postCreator: Types.ObjectId;
+  phoneNumberOpened: [
+    {
+      user: Types.ObjectId;
+      phoneStatus: boolean;
+    }
+  ];
 };

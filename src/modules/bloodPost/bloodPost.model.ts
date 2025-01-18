@@ -7,9 +7,13 @@ const bloodPostSchema = new Schema(
   {
     bloodGroup: {
       type: String,
-      enum: ["A+", " A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+      enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
     },
-    location: {
+    district: {
+      type: String,
+      required: true,
+    },
+    address: {
       type: String,
       required: true,
     },
@@ -28,14 +32,40 @@ const bloodPostSchema = new Schema(
     note: {
       type: String,
     },
-    donar: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    noOfBags: {
+      type: Number,
+      required: true,
     },
+    accepted: {
+      type: Number,
+      default: 0,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "donated", "canceled", "due"],
+      default: "pending",
+    },
+    donar: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     postCreator: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    phoneNumberOpened: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        phoneStatus: {
+          type: Boolean,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

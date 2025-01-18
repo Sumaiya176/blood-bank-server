@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 const auth = () => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    //console.log(req.headers.authorization);
+    //console.log("req.headers.authorization");
 
     const token = req.headers.authorization;
 
