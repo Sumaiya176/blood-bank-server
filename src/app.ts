@@ -21,15 +21,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or Postman)
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        callback(null, origin); // Dynamically set the allowed origin
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"], // Include the HTTP methods you need
-    credentials: true, // Include cookies or credentials
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Allow cookies and credentials
   })
 );
 
@@ -39,7 +38,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", router);
 
+app.use((req, res, next) => {
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
+
 app.get("/", (req, res) => {
+  console.log("Request Origin:", req.headers.origin);
   res.send("Hello Blood Bank!");
 });
 
