@@ -21,14 +21,18 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
+      console.log("Incoming Origin:", origin); // Log the incoming origin
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin); // Dynamically set the allowed origin
+        console.log("Allowed Origin:", origin); // Log allowed origin
+        callback(null, origin);
       } else {
+        console.log("Blocked Origin:", origin); // Log blocked origin
         callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // Allow cookies and credentials
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
