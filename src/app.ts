@@ -8,8 +8,10 @@ const app: Application = express();
 
 // app.use(
 //   cors({
-//     origin: "http://localhost:3000",
+//     origin: "https://blood-bank-frontend-blue.vercel.app", // Allow all origins (for development only)
+//     methods: ["GET", "POST", "PUT", "DELETE"],
 //     credentials: true,
+//     allowedHeaders: ["Content-Type", "Authorization"],
 //   })
 // );
 
@@ -24,7 +26,7 @@ app.use(
       console.log("Incoming Origin:", origin); // Log the incoming origin
       if (!origin || allowedOrigins.includes(origin)) {
         console.log("Allowed Origin:", origin); // Log allowed origin
-        callback(null, origin);
+        callback(null, true);
       } else {
         console.log("Blocked Origin:", origin); // Log blocked origin
         callback(new Error("Not allowed by CORS"));
@@ -40,6 +42,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+  next();
+});
 app.use("/api/v1", router);
 
 app.use((req, res, next) => {
