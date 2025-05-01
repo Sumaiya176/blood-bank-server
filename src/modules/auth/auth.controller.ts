@@ -7,6 +7,7 @@ import config from "../../config";
 const loginUser: RequestHandler = async (req, res, next) => {
   try {
     const result = await AuthServices.loginUser(req.body);
+    console.log("result", result);
     const { refreshToken, accessToken } = result;
 
     res.cookie("refreshToken", refreshToken, {
@@ -51,7 +52,7 @@ const refreshToken: RequestHandler = async (req, res, next) => {
 
     sendResponse(res, {
       success: true,
-      message: "Access token is retrieved successfully",
+      message: "Refresh token is retrieved successfully",
       data: result,
     });
   } catch (err) {

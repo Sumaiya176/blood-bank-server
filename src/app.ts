@@ -6,35 +6,15 @@ import cookieParser from "cookie-parser";
 
 const app: Application = express();
 
-// app.use(
-//   cors({
-//     origin: "https://blood-bank-frontend-blue.vercel.app", // Allow all origins (for development only)
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     credentials: true,
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//   })
-// );
-
-const allowedOrigins = [
-  "http://localhost:3000", // Local development
-  "https://blood-bank-frontend-blue.vercel.app", // Production frontend
+const cors_sites = [
+  "http://localhost:3000",
+  "https://blood-bank-frontend-blue.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      console.log("Incoming Origin:", origin); // Log the incoming origin
-      if (!origin || allowedOrigins.includes(origin)) {
-        console.log("Allowed Origin:", origin); // Log allowed origin
-        callback(null, true);
-      } else {
-        console.log("Blocked Origin:", origin); // Log blocked origin
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: cors_sites,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -62,5 +42,25 @@ app.get("/", (req, res) => {
 });
 
 app.use(globalErrorHandler);
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", cors_sites);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
+// eslint-disable-next-line no-unused-vars
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: "API NOT Found !",
+    error: {
+      path: req.originalUrl,
+      message: "Your requested path is not found",
+    },
+  });
+});
 
 export default app;

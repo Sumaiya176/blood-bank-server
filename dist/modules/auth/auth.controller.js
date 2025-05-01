@@ -20,6 +20,7 @@ const config_1 = __importDefault(require("../../config"));
 const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield auth_service_1.AuthServices.loginUser(req.body);
+        console.log("result", result);
         const { refreshToken, accessToken } = result;
         res.cookie("refreshToken", refreshToken, {
             secure: config_1.default.node_env === "production",
@@ -60,7 +61,7 @@ const refreshToken = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const result = yield auth_service_1.AuthServices.refreshToken(refreshToken);
         (0, sendResponse_1.sendResponse)(res, {
             success: true,
-            message: "Access token is retrieved successfully",
+            message: "Refresh token is retrieved successfully",
             data: result,
         });
     }

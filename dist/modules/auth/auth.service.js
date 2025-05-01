@@ -38,7 +38,7 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         id: isUserExist._id,
     };
     const accessToken = (0, auth_utils_1.createToken)(user, config_1.default.jwt_access_secret, "10d");
-    const refreshToken = (0, auth_utils_1.createToken)(user, config_1.default.jwt_refresh_secret, "15s");
+    const refreshToken = (0, auth_utils_1.createToken)(user, config_1.default.jwt_refresh_secret, "30d");
     return { accessToken, refreshToken };
 });
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
