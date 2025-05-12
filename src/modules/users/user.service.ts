@@ -1,5 +1,6 @@
 import AppError from "../../errors/AppError";
 import { BloodPost } from "../bloodPost/bloodPost.model";
+import { DonorRequest } from "../donorRequest/donorRequest.model";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 
@@ -81,7 +82,16 @@ const updateUserRegistration = async (id: string, user: Partial<TUser>) => {
 };
 
 const getMyPost = async (uName: string) => {
-  const result = await User.findOne({ name: uName }).populate("postHistory");
+  const result = await User.findOne({ name: uName }).populate({
+    path: "postHistory",
+    populate: {
+      path: "donarRequest",
+      model: "DonorRequest",
+    },
+  });
+  // const result = await User.findOne({ name: uName })
+  //   .populate("postHistory")
+  //   .populate("donorRequest");
 
   if (!result) {
     throw new Error("Failed to retrieved my posts");
@@ -91,8 +101,14 @@ const getMyPost = async (uName: string) => {
 };
 
 const getRequestedDonor = async (id: string) => {
-  console.log(id);
-  const result = await BloodPost.findById(id).populate("donar");
+  //console.log(id);
+  const result = await BloodPost.findById(id).populate({
+    path: "donarRequest",
+    populate: {
+      path: "receiver",
+      model: "User",
+    },
+  });
 
   if (!result) {
     throw new Error("Failed to retrieved requested donor");
@@ -102,11 +118,16 @@ const getRequestedDonor = async (id: string) => {
 };
 
 const getMyDonationHistory = async (uName: string) => {
-  const result = await User.findOne({ name: uName }).populate(
-    "donationHistory"
-  );
+  const result = await User.findOne({ name: uName }).populate({
+    path: "donationHistory",
+    model: DonorRequest,
+    populate: {
+      path: "post",
+      model: BloodPost,
+    },
+  });
 
-  console.log(result);
+  console.log("jgjhgjhkj", uName, result);
 
   if (!result) {
     throw new Error("Failed to retrieved my posts");
@@ -136,6 +157,7 @@ const makeConnection = async (payload: { name: string; id: string }) => {
 
 const connectedUsers = async (name: string) => {
   const result = await User.find({ name: name }).populate("friends");
+  //console.log("connected-user", result);
 
   if (!result) {
     throw new Error("Failed to find connected users");
@@ -173,7 +195,7 @@ const pointReduction = async (name: string, postId: string, userId: string) => {
     }
   );
 
-  console.log(openMobileNumber);
+  //console.log(openMobileNumber);
 
   if (!result) {
     throw new Error("Failed to reduce points from user");

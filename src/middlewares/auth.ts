@@ -12,7 +12,7 @@ const auth = () => {
 
     // ----------- checking whether token is sent or not -----------
     if (!token) {
-      throw new AppError(401, "You are not authorized");
+      throw new AppError(401, "you are not authorized");
     }
 
     jwt.verify(

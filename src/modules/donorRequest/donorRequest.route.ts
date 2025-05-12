@@ -16,5 +16,9 @@ router.patch(
   "/status-rejected",
   donorRequestControllers.updatePendingStatusToRejected
 );
+router.patch(
+  "/change-request-status/:id",
+  donorRequestControllers.changeDonarRequestStatus
+);
 
 export const donorRequestRouter = router;

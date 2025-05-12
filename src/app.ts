@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
   res.send("Hello Blood Bank!");
 });
 
-app.use(globalErrorHandler);
+// app.use(globalErrorHandler);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", cors_sites);
@@ -50,6 +50,8 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
+app.use(globalErrorHandler);
 
 // eslint-disable-next-line no-unused-vars
 app.use((req, res, next) => {

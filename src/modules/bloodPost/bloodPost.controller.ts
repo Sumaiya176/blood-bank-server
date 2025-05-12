@@ -45,11 +45,11 @@ const createBloodPost: RequestHandler = async (req, res, next) => {
 };
 
 const updateBloodPost: RequestHandler = async (req, res, next) => {
-  console.log("err");
+  //console.log("err");
   try {
     const { id } = req.params;
     const { bloodPost } = req.body;
-    console.log(id, bloodPost);
+    //console.log(id, bloodPost);
     const result = await bloodPostService.updateBloodPostToDatabase(
       id,
       bloodPost
@@ -67,11 +67,14 @@ const updateBloodPost: RequestHandler = async (req, res, next) => {
 };
 
 const createDonationHistory: RequestHandler = async (req, res, next) => {
-  const { id } = req.params;
-  const { postId } = req.body;
-  // console.log(id, req.body);
+  const { userId } = req.params;
+  const { requestId } = req.body;
+  console.log(userId, requestId, req.body);
   try {
-    const result = await bloodPostService.saveDonationHistoryIntoDb(id, postId);
+    const result = await bloodPostService.saveDonationHistoryIntoDb(
+      userId,
+      req.body
+    );
 
     sendResponse(res, {
       success: true,
@@ -120,8 +123,14 @@ const deleteBloodPost: RequestHandler = async (req, res, next) => {
 
 const updatePostStatus: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
+  const { status } = req.body;
+  console.log("status", req.body);
   try {
-    const result = await bloodPostService.updatePostStatus(id, req.body);
+    const result = await bloodPostService.updatePostStatus(
+      id,
+      status,
+      req.user.name
+    );
 
     sendResponse(res, {
       success: true,

@@ -13,10 +13,14 @@ router.get(
 router.post("/create-post", auth(), bloodPostControllers.createBloodPost);
 router.patch("/:id", bloodPostControllers.updateBloodPost);
 router.patch(
-  "/create-donation-history/:id",
+  "/create-donation-history/:userId",
   bloodPostControllers.createDonationHistory
 );
-router.patch("/update-post-status/:id", bloodPostControllers.updatePostStatus);
+router.patch(
+  "/update-post-status/:id",
+  auth(),
+  bloodPostControllers.updatePostStatus
+);
 router.patch(
   "/create-donation-cancel-history/:id",
   bloodPostControllers.createDonationCancelHistory

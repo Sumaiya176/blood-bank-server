@@ -7,9 +7,10 @@ const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  //console.log("global", err);
+  console.log("global", err);
   let statusCode = 500;
-  let message = "Something went wrong";
+  let success = false;
+  let message = err.message || "Something went wrong";
   let errMessage = "Something went wrong";
 
   if (err instanceof AppError) {
@@ -18,7 +19,7 @@ const globalErrorHandler = (
     errMessage = err.message;
   }
   res.status(statusCode).json({
-    success: false,
+    success,
     message,
     errMessage: err.message,
   });

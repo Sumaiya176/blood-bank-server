@@ -7,7 +7,7 @@ import config from "../../config";
 const loginUser: RequestHandler = async (req, res, next) => {
   try {
     const result = await AuthServices.loginUser(req.body);
-    console.log("result", result);
+    //console.log("result", result);
     const { refreshToken, accessToken } = result;
 
     res.cookie("refreshToken", refreshToken, {
@@ -23,6 +23,7 @@ const loginUser: RequestHandler = async (req, res, next) => {
       },
     });
   } catch (err) {
+    console.log("next err", err);
     next(err);
   }
 };

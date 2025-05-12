@@ -3,6 +3,7 @@ import { User } from "../users/user.model";
 import { TBloodPost } from "./bloodPost.interface";
 import { BloodPost } from "./bloodPost.model";
 import AppError from "../../errors/AppError";
+import { TUser } from "../users/user.interface";
 
 const getAllBloodPosts = async () => {
   const result = await BloodPost.find({
@@ -56,7 +57,7 @@ const updateBloodPostToDatabase = async (
   id: string,
   payload: Partial<TBloodPost>
 ) => {
-  console.log(payload);
+  //console.log(payload);
   const result = await BloodPost.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
@@ -71,13 +72,13 @@ const updateBloodPostToDatabase = async (
 
 const saveDonationHistoryIntoDb = async (
   id: string,
-  postId: { id: string }
+  payload: { requestId: string }
 ) => {
   const findUser = await User.findById(id);
   const findDonationHistory = findUser?.donationHistory.includes(
-    postId.id as unknown as ObjectId
+    payload.requestId as unknown as ObjectId
   );
-  console.log("findDonationHistory", findDonationHistory);
+  //console.log("findDonationHistory", findDonationHistory);
 
   if (findDonationHistory) {
     throw new AppError(200, "This post is already accepted");
@@ -85,19 +86,12 @@ const saveDonationHistoryIntoDb = async (
   const result = await User.findByIdAndUpdate(
     id,
     {
-      $push: { donationHistory: postId.id },
+      $push: { donationHistory: payload.requestId },
       $inc: { accepted: 1 },
     },
     {
       new: true,
       runValidators: true,
-    }
-  );
-  const increaseAcceptedValueAndAddDonor = await BloodPost.findByIdAndUpdate(
-    postId.id,
-    {
-      // $inc: { accepted: 1 },
-      $push: { donar: id },
     }
   );
 
@@ -140,11 +134,23 @@ const deleteBloodPost = async (id: string) => {
   return result;
 };
 
-const updatePostStatus = async (id: string, payload: {}) => {
-  console.log(id, payload);
+const updatePostStatus = async (
+  id: string,
+  payload: string,
+  userName: string
+) => {
+  console.log("updatePostStatus", id, payload, userName);
   const result = await BloodPost.findByIdAndUpdate(id, {
     status: "donated",
   });
+
+  const increasePoints = await User.findOneAndUpdate(
+    { name: userName },
+    {
+      $inc: { points: 2 },
+    },
+    { new: true }
+  );
 
   if (!result) {
     throw new Error("Failed to update post status");
@@ -154,7 +160,7 @@ const updatePostStatus = async (id: string, payload: {}) => {
 };
 
 const cancelRequestedDonor = async (id: string, payload: string) => {
-  console.log(id, payload);
+  //console.log(id, payload);
   const result = await BloodPost.findByIdAndUpdate(
     id,
     { $pull: { donar: payload } },

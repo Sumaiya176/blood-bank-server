@@ -3,20 +3,26 @@ import { sendResponse } from "../../util/sendResponse";
 import donarRequestService from "./donorRequest.service";
 
 const createDonorRequest: RequestHandler = async (req, res, next) => {
-  const { request } = req.body;
-  //console.log(request);
-  const result = await donarRequestService.donorRequestSendToDatabase(request);
+  try {
+    const { request } = req.body;
 
-  sendResponse(res, {
-    success: true,
-    message: "Request Sent successfully",
-    data: result,
-  });
+    const result = await donarRequestService.donorRequestSendToDatabase(
+      request
+    );
+
+    sendResponse(res, {
+      success: true,
+      message: "Request sent successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error); // Forward the error to the global error handler middleware
+  }
 };
 
 const getReceivedDonorRequest: RequestHandler = async (req, res, next) => {
   const { userId } = req.query;
-  console.log(userId);
+  //console.log(userId);
   const result = await donarRequestService.getReceivedDonorRequest(
     userId as string
   );
@@ -34,7 +40,7 @@ const updatePendingStatusToAccepted: RequestHandler = async (
   next
 ) => {
   const { requestId } = req.query;
-  console.log(requestId);
+  //(requestId);
   const result = await donarRequestService.updatePendingStatusToAccepted(
     requestId as string
   );
@@ -52,7 +58,7 @@ const updatePendingStatusToRejected: RequestHandler = async (
   next
 ) => {
   const { requestId } = req.query;
-  console.log(requestId);
+  //console.log(requestId);
   const result = await donarRequestService.updatePendingStatusToRejected(
     requestId as string
   );
@@ -64,9 +70,30 @@ const updatePendingStatusToRejected: RequestHandler = async (
   });
 };
 
+const changeDonarRequestStatus: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const result = await donarRequestService.changeDonarRequestStatus(
+      id as string,
+      status
+    );
+
+    sendResponse(res, {
+      success: true,
+      message: "Changed donar request status successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const donorRequestControllers = {
   createDonorRequest,
   getReceivedDonorRequest,
   updatePendingStatusToAccepted,
   updatePendingStatusToRejected,
+  changeDonarRequestStatus,
 };

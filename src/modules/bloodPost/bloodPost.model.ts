@@ -42,13 +42,13 @@ const bloodPostSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "donated", "canceled", "due"],
+      enum: ["pending", "donated"],
       default: "pending",
     },
-    donar: [
+    donarRequest: [
       {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "DonorRequest",
       },
     ],
     postCreator: {

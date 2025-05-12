@@ -11,17 +11,19 @@ const loginUser = async (payload: TLoginUser) => {
   const isUserExist = await User.findOne({ name: payload.name }).select(
     "+password"
   );
+  //console.log("payload", isUserExist, payload?.password, isUserExist?.password);
   if (!isUserExist) {
     throw new AppError(404, "User is not found");
   }
 
-  //console.log("pass", isUserExist, payload?.password, isUserExist?.password);
   // -------------- password matching ---------------
   const isPasswordMatched = await bcrypt.compare(
     payload?.password,
     isUserExist?.password
   );
+
   if (!isPasswordMatched) {
+    //console.log("payload", !isPasswordMatched);
     throw new AppError(401, "Wrong password");
   }
 
