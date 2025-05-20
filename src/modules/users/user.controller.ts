@@ -2,6 +2,23 @@ import { RequestHandler } from "express";
 import userService from "./user.service";
 import { sendResponse } from "../../util/sendResponse";
 
+const createUser: RequestHandler = async (req, res, next) => {
+  try {
+    const { user } = req.body;
+    //console.log("user from controller", user);
+    const result = await userService.createUserRegistration(user);
+
+    res.status(200).json({
+      success: true,
+      message: "User is registration request received successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log("createUser Controller", err);
+    next(err);
+  }
+};
+
 const activeUsers: RequestHandler = async (req, res, next) => {
   try {
     const result = await userService.getAllActiveUsers();
@@ -52,22 +69,6 @@ const getSingleUser: RequestHandler = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Retrieved single user successfully",
-      data: result,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-const createUser: RequestHandler = async (req, res, next) => {
-  try {
-    const { user } = req.body;
-    //console.log("user from controller", user);
-    const result = await userService.createUserRegistration(user);
-
-    res.status(200).json({
-      success: true,
-      message: "User is Registered successfully",
       data: result,
     });
   } catch (err) {

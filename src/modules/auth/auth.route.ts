@@ -24,4 +24,6 @@ router.post(
   AuthControllers.similarUserNameChecking
 );
 
+router.get("/verify-email", AuthControllers.verifyEmail);
+
 export const AuthRouters = router;

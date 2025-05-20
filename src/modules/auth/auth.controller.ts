@@ -2,6 +2,8 @@ import { RequestHandler } from "express";
 import { sendResponse } from "../../util/sendResponse";
 import { AuthServices } from "./auth.service";
 import config from "../../config";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { User } from "../users/user.model";
 
 // ------------ user login ------------
 const loginUser: RequestHandler = async (req, res, next) => {
@@ -81,9 +83,43 @@ const similarUserNameChecking: RequestHandler = async (req, res, next) => {
   }
 };
 
+// ----------------------- Email verification ---------------
+const verifyEmail: RequestHandler = async (req, res) => {
+  const { token } = req.query;
+
+  try {
+    const decoded = jwt.verify(
+      token as string,
+      config.jwt_access_secret as string
+    ) as JwtPayload;
+    const userId = decoded.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    sendResponse(res, {
+      success: true,
+      message: "Email verified successfully",
+      data: "Email verified successfully",
+    });
+  } catch (err) {
+    sendResponse(res, {
+      success: false,
+      message: "Invalid or expired verification token",
+      data: "Invalid or expired verification token",
+    });
+  }
+};
+
 export const AuthControllers = {
   loginUser,
   logOut,
   refreshToken,
   similarUserNameChecking,
+  verifyEmail,
 };

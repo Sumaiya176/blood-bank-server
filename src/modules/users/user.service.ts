@@ -1,8 +1,37 @@
+import config from "../../config";
 import AppError from "../../errors/AppError";
+import { sendVerificationEmail } from "../../util/emailService";
 import { BloodPost } from "../bloodPost/bloodPost.model";
 import { DonorRequest } from "../donorRequest/donorRequest.model";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+const createUserRegistration = async (payload: TUser) => {
+  const isUserAlreadyExist = await User.findOne({ name: payload.name });
+  if (isUserAlreadyExist) {
+    throw new Error("User is already exists");
+  }
+
+  const result = await User.create(payload);
+
+  if (!result) {
+    throw new Error("Failed to register new user");
+  }
+  // Generate email verification token
+  const token = jwt.sign(
+    { id: result._id },
+    config.jwt_access_secret as string,
+    { expiresIn: "1h" }
+  );
+
+  const verificationLink = `${config.frontend_url}/verify-email?token=${token}`;
+
+  // Send the email
+  await sendVerificationEmail(result.email, verificationLink);
+
+  return result;
+};
 
 const getAllActiveUsers = async () => {
   const result = await User.find({ donationAvailability: true });
@@ -47,21 +76,6 @@ const getSingleUser = async (name: string) => {
 
   if (!result) {
     throw new Error("Failed to retrieve single user");
-  }
-
-  return result;
-};
-
-const createUserRegistration = async (payload: TUser) => {
-  const isUserAlreadyExist = await User.findOne({ name: payload.name });
-  if (isUserAlreadyExist) {
-    throw new Error("User is already exists");
-  }
-
-  const result = await User.create(payload);
-
-  if (!result) {
-    throw new Error("Failed to register new user");
   }
 
   return result;

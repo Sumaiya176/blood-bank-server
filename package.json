@@ -17,6 +17,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/nodemailer": "^6.4.17",
     "typescript": "^5.5.4"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.3",
+    "nodemailer": "^7.0.3",
     "ts-node-dev": "^2.0.0",
     "zod": "^3.23.8"
   }

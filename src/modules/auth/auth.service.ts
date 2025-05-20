@@ -16,6 +16,10 @@ const loginUser = async (payload: TLoginUser) => {
     throw new AppError(404, "User is not found");
   }
 
+  if (!isUserExist.isVerified) {
+    throw new AppError(401, "Please verify your email before logging in");
+  }
+
   // -------------- password matching ---------------
   const isPasswordMatched = await bcrypt.compare(
     payload?.password,

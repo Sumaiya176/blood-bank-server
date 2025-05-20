@@ -16,6 +16,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: true,
@@ -74,11 +78,18 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   const user = this;
-
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  );
+  if (!user.isModified("password")) {
+    return next();
+  }
+  try {
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    next();
+  } catch (err) {
+    next(err as any);
+  }
 });
 
 export const User = model<TUser, UserModel>("User", userSchema);

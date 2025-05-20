@@ -4,6 +4,7 @@ export type TUser = {
   name: string;
   email: string;
   password: string;
+  isVerified: boolean;
   age: number;
   district: string;
   lastDonationDate: string;
