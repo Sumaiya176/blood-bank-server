@@ -10,7 +10,7 @@ export type TBloodPost = {
   note: string;
   noOfBags: number;
   accepted: number;
-  status: "pending" | "donated";
+  status: "pending" | "donated" | "cancelled";
   postCreator: Types.ObjectId;
   phoneNumberOpened: [
     {

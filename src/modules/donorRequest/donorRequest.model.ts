@@ -19,7 +19,7 @@ const donorRequestSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected", "due"],
+      enum: ["pending", "accepted", "rejected", "due", "donated", "cancelled"],
       default: "pending",
     },
   },

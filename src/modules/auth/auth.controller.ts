@@ -9,7 +9,6 @@ import { User } from "../users/user.model";
 const loginUser: RequestHandler = async (req, res, next) => {
   try {
     const result = await AuthServices.loginUser(req.body);
-    //console.log("result", result);
     const { refreshToken, accessToken } = result;
 
     res.cookie("refreshToken", refreshToken, {
@@ -33,7 +32,17 @@ const loginUser: RequestHandler = async (req, res, next) => {
 // ------------ user login ------------
 const logOut: RequestHandler = async (req, res, next) => {
   try {
-    res.clearCookie("accessToken");
+    const token = req.cookies.refreshToken;
+    if (token) {
+      const decoded = jwt.decode(token) as any;
+      const user = await User.findById(decoded.id);
+      if (user) {
+        user.refreshToken = null;
+        await user.save();
+      }
+    }
+
+    res.clearCookie("refreshToken");
 
     sendResponse(res, {
       success: true,
@@ -49,14 +58,22 @@ const logOut: RequestHandler = async (req, res, next) => {
 
 // ------------ user login ------------
 const refreshToken: RequestHandler = async (req, res, next) => {
-  const { refreshToken } = req.cookies;
+  const token = req.cookies.refreshToken;
   try {
-    const result = await AuthServices.refreshToken(refreshToken);
+    const result = await AuthServices.refreshToken(token);
+
+    const { refreshToken, accessToken } = result;
+    res.cookie("refreshToken", refreshToken, {
+      secure: config.node_env === "production",
+      httpOnly: true,
+    });
 
     sendResponse(res, {
       success: true,
       message: "Refresh token is retrieved successfully",
-      data: result,
+      data: {
+        accessToken,
+      },
     });
   } catch (err) {
     next(err);

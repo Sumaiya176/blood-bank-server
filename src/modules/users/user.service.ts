@@ -6,6 +6,7 @@ import { DonorRequest } from "../donorRequest/donorRequest.model";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const createUserRegistration = async (payload: TUser) => {
   const isUserAlreadyExist = await User.findOne({ name: payload.name });
@@ -27,8 +28,15 @@ const createUserRegistration = async (payload: TUser) => {
 
   const verificationLink = `${config.frontend_url}/verify-email?token=${token}`;
 
+  const html = `
+    <div style="font-family: sans-serif; text-align: center;">
+      <h3>Welcome to Blood Bank</h3>
+      <p>Please verify your email by clicking the link below:</p>
+      <a href="${verificationLink}" style="display: inline-block; padding: 12px 24px; background-color: #d62828; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">Verify Email</a>
+      </div>
+    `;
   // Send the email
-  await sendVerificationEmail(result.email, verificationLink);
+  await sendVerificationEmail(result.email, html);
 
   return result;
 };
@@ -141,8 +149,6 @@ const getMyDonationHistory = async (uName: string) => {
     },
   });
 
-  console.log("jgjhgjhkj", uName, result);
-
   if (!result) {
     throw new Error("Failed to retrieved my posts");
   }
@@ -220,6 +226,70 @@ const pointReduction = async (name: string, postId: string, userId: string) => {
   return result;
 };
 
+const changePassword = async (name: string) => {
+  const user = await User.findOne({ name });
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000);
+
+  user.otp = code;
+  user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000) as Date; // 5 minutes
+  await user.save();
+
+  //const result = await sendEmail(user.email, "Your OTP Code", `Your OTP is: ${code}`);
+
+  const html = `
+    <div style="font-family: sans-serif; text-align: center;">
+      <h1>Thanks for staying with Blood Bank</h1>
+      <h3>Here is your OTP below:</h3>
+      <h3>${code}</h3>
+      </div>
+    `;
+  const result = await sendVerificationEmail(user.email, html);
+  return result;
+};
+
+const verifyOtp = async (name: string, otp: string) => {
+  const user = await User.findOne({ name });
+
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  if (
+    Number(otp) !== user.otp ||
+    new Date() > new Date(user.otpExpiresAt as Date)
+  ) {
+    throw new AppError(400, "OTP is invalid or expired");
+  }
+
+  return { message: "OTP verified" };
+};
+
+const resetPassword = async (name: string, otp: string, password: string) => {
+  const user = await User.findOne({ name });
+
+  console.log(otp, password);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  if (
+    Number(otp) !== user.otp ||
+    new Date() > new Date(user.otpExpiresAt as Date)
+  ) {
+    throw new AppError(400, "OTP is invalid or expired");
+  }
+
+  user.password = password;
+  user.otp = null;
+  user.otpExpiresAt = null;
+  await user.save();
+
+  return { message: "password reset successfully" };
+};
 export default {
   createUserRegistration,
   updateUserRegistration,
@@ -233,4 +303,7 @@ export default {
   connectedUsers,
   pointReduction,
   getRequestedDonor,
+  changePassword,
+  verifyOtp,
+  resetPassword,
 };

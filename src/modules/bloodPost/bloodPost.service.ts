@@ -3,12 +3,12 @@ import { User } from "../users/user.model";
 import { TBloodPost } from "./bloodPost.interface";
 import { BloodPost } from "./bloodPost.model";
 import AppError from "../../errors/AppError";
-import { TUser } from "../users/user.interface";
 
-const getAllBloodPosts = async () => {
-  const result = await BloodPost.find({
-    $expr: { $gt: ["$noOfBags", "$accepted"] },
-  });
+const getAllBloodPosts = async (page: number, limit: number, skip: number) => {
+  const result = await BloodPost.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 
   if (!result) {
     throw new Error("Failed to get all blood event posts");
@@ -139,9 +139,9 @@ const updatePostStatus = async (
   payload: string,
   userName: string
 ) => {
-  console.log("updatePostStatus", id, payload, userName);
+  console.log("updatePostStatus", id, userName);
   const result = await BloodPost.findByIdAndUpdate(id, {
-    status: "donated",
+    status: payload,
   });
 
   const increasePoints = await User.findOneAndUpdate(

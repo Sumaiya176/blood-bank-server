@@ -4,7 +4,16 @@ import { sendResponse } from "../../util/sendResponse";
 
 const getAllBloodPosts: RequestHandler = async (req, res, next) => {
   //console.log(" post controller", req?.user);
-  const result = await bloodPostService.getAllBloodPosts();
+  const { page, limit } = req.query;
+  const pageNumber = parseInt(page as string) || 1;
+  const limitNumber = parseInt(limit as string) || 9;
+
+  const skip = (pageNumber - 1) * limitNumber;
+  const result = await bloodPostService.getAllBloodPosts(
+    pageNumber,
+    limitNumber,
+    skip
+  );
 
   sendResponse(res, {
     success: true,
@@ -69,7 +78,6 @@ const updateBloodPost: RequestHandler = async (req, res, next) => {
 const createDonationHistory: RequestHandler = async (req, res, next) => {
   const { userId } = req.params;
   const { requestId } = req.body;
-  console.log(userId, requestId, req.body);
   try {
     const result = await bloodPostService.saveDonationHistoryIntoDb(
       userId,
@@ -124,7 +132,6 @@ const deleteBloodPost: RequestHandler = async (req, res, next) => {
 const updatePostStatus: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   const { status } = req.body;
-  console.log("status", req.body);
   try {
     const result = await bloodPostService.updatePostStatus(
       id,

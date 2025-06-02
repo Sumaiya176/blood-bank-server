@@ -3,6 +3,9 @@ import cors from "cors";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import router from "./routes";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import AppError from "./errors/AppError";
 
 const app: Application = express();
 
@@ -18,6 +21,11 @@ app.use(
   })
 );
 
+app.use(helmet());
+
+// Limit JSON body size
+app.use(express.json({ limit: "1mb" }));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -29,12 +37,27 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+// General rate limiter for all APIs
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  handler: (req, res, next) => {
+    // Pass the error to your global error handler
+    const error = new AppError(
+      429,
+      "Too many requests, please try again after 15 minutes."
+    );
+    next(error);
+  },
+});
+app.use("/api/", generalLimiter);
 app.use("/api/v1", router);
 
-app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("Request Origin:", req.headers.origin);
+//   next();
+// });
 
 app.get("/", (req, res) => {
   console.log("Request Origin:", req.headers.origin);

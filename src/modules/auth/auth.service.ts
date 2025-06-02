@@ -8,47 +8,47 @@ import { createToken } from "./auth.utils";
 
 const loginUser = async (payload: TLoginUser) => {
   // -------------- checking user is exist or not ---------------
-  const isUserExist = await User.findOne({ name: payload.name }).select(
-    "+password"
-  );
-  //console.log("payload", isUserExist, payload?.password, isUserExist?.password);
-  if (!isUserExist) {
+  const user = await User.findOne({ name: payload.name }).select("+password");
+  if (!user) {
     throw new AppError(404, "User is not found");
-  }
-
-  if (!isUserExist.isVerified) {
-    throw new AppError(401, "Please verify your email before logging in");
   }
 
   // -------------- password matching ---------------
   const isPasswordMatched = await bcrypt.compare(
     payload?.password,
-    isUserExist?.password
+    user?.password
   );
 
   if (!isPasswordMatched) {
-    //console.log("payload", !isPasswordMatched);
-    throw new AppError(401, "Wrong password");
+    throw new AppError(403, "Wrong password");
+  }
+
+  // -------------- user verified or not ---------------
+  if (!user.isVerified) {
+    throw new AppError(403, "Please verify your email before logging in");
   }
 
   // -------------- creating access and refresh token using jwt ---------------
-  const user = {
-    name: isUserExist.name,
-    email: isUserExist.email,
-    id: isUserExist._id,
+  const userPayload = {
+    name: user.name,
+    email: user.email,
+    id: user._id,
   };
 
   const accessToken = createToken(
-    user,
+    userPayload,
     config.jwt_access_secret as string,
-    "10d"
+    "15m"
   );
 
   const refreshToken = createToken(
-    user,
+    userPayload,
     config.jwt_refresh_secret as string,
-    "30d"
+    "10d"
   );
+
+  user.refreshToken = refreshToken;
+  await user.save();
 
   return { accessToken, refreshToken };
 };
@@ -56,35 +56,48 @@ const loginUser = async (payload: TLoginUser) => {
 const refreshToken = async (token: string) => {
   // ------------- checking whether token is sent or not -------------
   if (!token) {
-    throw new AppError(401, "You are not authorized");
+    throw new AppError(403, "You are not authorized");
   }
 
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string
-  ) as JwtPayload;
+  // ------------- checking whether user is exist or not -------------
+  try {
+    const decoded = jwt.verify(
+      token,
+      config.jwt_refresh_secret as string
+    ) as JwtPayload;
 
-  const { name } = decoded;
+    const { name } = decoded;
 
-  const isUserExist = await User.findOne({ name: name });
-  if (!isUserExist) {
-    throw new AppError(404, "User is not found");
+    const user = await User.findOne({ name: name });
+    if (!user || user.refreshToken !== token) {
+      throw new AppError(404, "User is not found");
+    }
+
+    // -------------- creating access token using jwt ---------------
+    const userPayload = {
+      name: user.name,
+      email: user.email,
+      id: user._id,
+    };
+
+    const accessToken = createToken(
+      userPayload,
+      config.jwt_access_secret as string,
+      "15m"
+    );
+    const refreshToken = createToken(
+      userPayload,
+      config.jwt_refresh_secret as string,
+      "10d"
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken };
+  } catch (err) {
+    throw new AppError(401, "Invalid token");
   }
-
-  // -------------- creating access token using jwt ---------------
-  const user = {
-    name: isUserExist.name,
-    email: isUserExist.email,
-    id: isUserExist._id,
-  };
-
-  const accessToken = createToken(
-    user,
-    config.jwt_access_secret as string,
-    "10s"
-  );
-
-  return { accessToken };
 };
 
 const userNameChecking = async (payload: Partial<TLoginUser>) => {

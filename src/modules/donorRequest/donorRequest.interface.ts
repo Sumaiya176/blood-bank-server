@@ -4,5 +4,5 @@ export type TDonorRequest = {
   sender: Types.ObjectId;
   receiver: Types.ObjectId;
   post: Types.ObjectId;
-  status: "pending" | "accepted" | "rejected" | "due";
+  status: "pending" | "accepted" | "rejected" | "due" | "donated" | "cancelled";
 };

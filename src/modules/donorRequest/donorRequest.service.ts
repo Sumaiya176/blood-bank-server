@@ -38,6 +38,7 @@ const getReceivedDonorRequest = async (id: string) => {
   const result = await DonorRequest.find({
     receiver: id,
   })
+    .sort({ createdAt: -1 })
     .populate("post")
     .populate("sender", "name email");
 

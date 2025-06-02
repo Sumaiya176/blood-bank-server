@@ -11,6 +11,10 @@ export type TUser = {
   donationAvailability: boolean;
   bloodGroup: string;
   points: number;
+  refreshToken: string | null;
+  otp: number | null;
+  otpExpiresAt: Date | null;
+  lastSeenAt: Date;
   donationHistory: [Types.ObjectId];
   postHistory: [Types.ObjectId];
   cancelHistory: [Types.ObjectId];

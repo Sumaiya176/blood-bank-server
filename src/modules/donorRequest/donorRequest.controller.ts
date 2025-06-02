@@ -16,22 +16,27 @@ const createDonorRequest: RequestHandler = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
-    next(error); // Forward the error to the global error handler middleware
+    console.log("1", error);
+    next(error);
   }
 };
 
 const getReceivedDonorRequest: RequestHandler = async (req, res, next) => {
-  const { userId } = req.query;
-  //console.log(userId);
-  const result = await donarRequestService.getReceivedDonorRequest(
-    userId as string
-  );
+  try {
+    const { userId } = req.query;
+    const result = await donarRequestService.getReceivedDonorRequest(
+      userId as string
+    );
 
-  sendResponse(res, {
-    success: true,
-    message: "Requests retrieved successfully",
-    data: result,
-  });
+    sendResponse(res, {
+      success: true,
+      message: "Requests retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.log("2", error);
+    next(error);
+  }
 };
 
 const updatePendingStatusToAccepted: RequestHandler = async (
@@ -39,17 +44,21 @@ const updatePendingStatusToAccepted: RequestHandler = async (
   res,
   next
 ) => {
-  const { requestId } = req.query;
-  //(requestId);
-  const result = await donarRequestService.updatePendingStatusToAccepted(
-    requestId as string
-  );
+  try {
+    const { requestId } = req.query;
+    const result = await donarRequestService.updatePendingStatusToAccepted(
+      requestId as string
+    );
 
-  sendResponse(res, {
-    success: true,
-    message: "Pending status updated successfully",
-    data: result,
-  });
+    sendResponse(res, {
+      success: true,
+      message: "Pending status updated successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log("3", err);
+    next(err);
+  }
 };
 
 const updatePendingStatusToRejected: RequestHandler = async (
@@ -57,17 +66,21 @@ const updatePendingStatusToRejected: RequestHandler = async (
   res,
   next
 ) => {
-  const { requestId } = req.query;
-  //console.log(requestId);
-  const result = await donarRequestService.updatePendingStatusToRejected(
-    requestId as string
-  );
+  try {
+    const { requestId } = req.query;
+    const result = await donarRequestService.updatePendingStatusToRejected(
+      requestId as string
+    );
 
-  sendResponse(res, {
-    success: true,
-    message: "Pending status updated successfully",
-    data: result,
-  });
+    sendResponse(res, {
+      success: true,
+      message: "Pending status updated successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.log("4", err);
+    next(err);
+  }
 };
 
 const changeDonarRequestStatus: RequestHandler = async (req, res, next) => {
@@ -86,6 +99,7 @@ const changeDonarRequestStatus: RequestHandler = async (req, res, next) => {
       data: result,
     });
   } catch (err) {
+    console.log("5", err);
     next(err);
   }
 };

@@ -1,9 +1,9 @@
 import { Response } from "express";
 
 type TResponseData<T> = {
-  success: boolean;
-  message: string;
-  data: T;
+  success: boolean | null;
+  message: string | null;
+  data: T | null;
 };
 
 export const sendResponse = <T>(

@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import userService from "./user.service";
 import { sendResponse } from "../../util/sendResponse";
+import { User } from "./user.model";
 
 const createUser: RequestHandler = async (req, res, next) => {
   try {
@@ -172,7 +173,6 @@ const makingConnection: RequestHandler = async (req, res, next) => {
 };
 
 const connectedUsers: RequestHandler = async (req, res, next) => {
-  //console.log("cc", req.body);
   try {
     const result = await userService.connectedUsers(req?.user?.name);
 
@@ -205,6 +205,70 @@ const pointReduction: RequestHandler = async (req, res, next) => {
   }
 };
 
+const changePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await userService.changePassword(req.user.name);
+
+    sendResponse(res, {
+      success: true,
+      message: "OTP sent to email",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const verifyOtp: RequestHandler = async (req, res, next) => {
+  try {
+    const { otp } = req.query;
+    const result = await userService.verifyOtp(req.user.name, otp as string);
+
+    sendResponse(res, {
+      success: true,
+      message: "OTP verified",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const resetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const { otp, password } = req.body;
+    const result = await userService.resetPassword(
+      req.user.name,
+      otp,
+      password
+    );
+
+    sendResponse(res, {
+      success: true,
+      message: "Password reset successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateLastSeen: RequestHandler = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      lastSeenAt: new Date(),
+    });
+
+    sendResponse(res, {
+      success: true,
+      message: null,
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   createUser,
   updateUser,
@@ -219,4 +283,8 @@ export default {
   connectedUsers,
   pointReduction,
   getRequestedDonor,
+  changePassword,
+  verifyOtp,
+  resetPassword,
+  updateLastSeen,
 };

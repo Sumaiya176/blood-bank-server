@@ -51,6 +51,23 @@ const userSchema = new Schema(
       min: 0,
       default: 2,
     },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
+    otp: {
+      type: Number,
+      default: null,
+    },
+    otpExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    lastSeenAt: {
+      type: Date,
+      default: Date.now,
+    },
+
     donationHistory: [
       {
         type: Schema.Types.ObjectId,
